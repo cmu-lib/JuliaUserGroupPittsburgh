@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  {{if hasmath}} {{insert head_katex.html }}     {{end}}
+  {{if hascode}} {{insert head_highlight.html }}   {{end}}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@300;400;600;800&family=Playfair+Display:wght@400&display=swap">
+  <link rel="stylesheet" href="/css/franklin.css">
+  <link rel="icon" href="/assets/favicon.png">
+  {{isdef title}} <title>{{fill title}}</title>  {{end}}
+  <meta name="description" content="{{fill website_descr}}">
+  <!-- Link previews (Open Graph / Twitter). The image URL must be absolute. -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="{{fill website_title}}">
+  <meta property="og:title" content="{{isdef title}}{{fill title}}{{else}}{{fill website_title}}{{end}}">
+  <meta property="og:description" content="{{fill website_descr}}">
+  <meta property="og:image" content="{{fill website_url}}assets/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Julia Language User Group Pittsburgh: the three Julia logo circles with gold Pittsburgh bridges">
+  <meta name="twitter:card" content="summary_large_image">
+</head>
+<body class="{{if is_home}}home{{else}}inner{{end}}">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="poster">
+{{insert header.html}}
+
+<main id="main">
+<!-- Content appended here -->

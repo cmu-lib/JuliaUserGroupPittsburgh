@@ -1,0 +1,541 @@
+/* ==================================================================
+    VARIABLES
+    Poster palette. The circle colours are the official Julia logo
+    colours mixed 25% into the background, which reproduces the poster.
+================================================================== */
+
+:root {
+  --bg: #dddee8;
+  --ink: #111111;
+  --muted: #4d4e5e;
+
+  --julia-green: #389826;
+  --julia-red: #cb3c33;
+  --julia-purple: #9558b2;
+  /* Darkened for text, so hovered links keep at least 4.5:1 contrast. */
+  --julia-purple-text: color-mix(in srgb, var(--julia-purple) 70%, black);
+
+  /* Pittsburgh bridge gold ("Aztec Gold"), deepened to read as thin lines. */
+  --gold: #b8862b;
+
+  --circle-green: color-mix(in srgb, var(--julia-green) 25%, var(--bg));
+  --circle-red: color-mix(in srgb, var(--julia-red) 25%, var(--bg));
+  --circle-purple: color-mix(in srgb, var(--julia-purple) 25%, var(--bg));
+
+  --block-background: color-mix(in srgb, white 55%, var(--bg));
+  --output-background: color-mix(in srgb, white 75%, var(--bg));
+
+  --sans: "League Spartan", Helvetica, Arial, sans-serif;
+  --serif: "Playfair Display", Georgia, serif;
+
+  --small: 15px;
+  --normal: 19px;
+
+  /* Poster unit: the poster is 100 units wide. Inner pages use a smaller scale. */
+  --u: 1vw;
+  --gutter: max(16px, 8.3vw);
+
+  /* Height of the top bridge strip, and how far the circles and masthead
+     are shifted down together, so the bridges stay clear of the logo. */
+  --bridges-top-height: clamp(24px, 3.75vw, 60px);
+  --drop: calc(var(--bridges-top-height) + 3 * var(--u));
+}
+
+body.inner { --u: 0.42vw; }
+
+@media (max-width: 700px) {
+  body.home  { --u: 1.6vw; }
+  body.inner { --u: 0.9vw; }
+}
+
+/* ==================================================================
+    DEFAULT FONT AND LAYOUT
+================================================================== */
+
+html {
+  font-family: var(--sans);
+  font-size: var(--normal);
+  color: var(--ink);
+  background: var(--bg);
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+}
+
+/* ==================================================================
+    ACCESSIBILITY
+================================================================== */
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Hidden until reached with the keyboard. */
+.skip-link {
+  position: absolute;
+  left: var(--gutter);
+  top: -100px;
+  z-index: 10;
+  padding: 0.5em 1em;
+  background: var(--ink);
+  color: var(--bg);
+  font-weight: 600;
+}
+
+.skip-link:focus { top: 0.5rem; }
+
+a:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.poster {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ==================================================================
+    BRIDGE DECORATIONS (generated in utils.jl)
+================================================================== */
+
+.bridges {
+  display: block;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.bridges path {
+  fill: none;
+  stroke: var(--gold);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.bridges .bridge-main { stroke-width: 2.5px; }
+.bridges .bridge-thin { stroke-width: 1.2px; }
+
+.bridges-top {
+  height: var(--bridges-top-height);
+}
+
+/* Pinned to the bottom of the page; on narrow screens the sides are cropped. */
+.bridges-bottom {
+  margin-top: auto;
+  height: max(110px, 13.75vw);
+}
+
+/* ==================================================================
+    CIRCLES
+    Positions measured on the 1920x1080 poster, in poster units,
+    relative to the left text margin (the gutter).
+================================================================== */
+
+.circles .circle {
+  position: absolute;
+  z-index: -1;
+  width: calc(21.8 * var(--u));
+  aspect-ratio: 1;
+  border-radius: 50%;
+}
+
+.circle-green  { background: var(--circle-green);  left: calc(var(--gutter) + 6 * var(--u));    top: calc(var(--drop) + 0.6 * var(--u)); }
+.circle-red    { background: var(--circle-red);    left: calc(var(--gutter) - 7 * var(--u));    top: calc(var(--drop) + 23.3 * var(--u)); }
+.circle-purple { background: var(--circle-purple); left: calc(var(--gutter) + 19.1 * var(--u)); top: calc(var(--drop) + 23.3 * var(--u)); }
+
+/* ==================================================================
+    MASTHEAD
+================================================================== */
+
+.masthead {
+  padding: calc(var(--drop) + 2 * var(--u)) var(--gutter) 0;
+  line-height: 1.05;
+}
+
+.masthead-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.masthead-heavy,
+.masthead-light {
+  font-size: max(1.6rem, calc(7.2 * var(--u)));
+  letter-spacing: -0.01em;
+}
+
+.masthead-heavy { font-weight: 800; }
+.masthead-light { font-weight: 300; }
+
+/* Wider gap between the two weights, only when they share a line. */
+@media (min-width: 701px) {
+  .masthead-light { margin-left: 0.12em; }
+}
+
+.masthead-city {
+  display: block;
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: max(1.8rem, calc(8 * var(--u)));
+  margin-top: calc(0.8 * var(--u));
+}
+
+.site-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4em 1.4em;
+  margin-top: 0.6rem;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+body.home .site-nav { margin-bottom: 1.2rem; }
+
+.site-nav a {
+  color: var(--ink);
+  text-decoration: none;
+  border-bottom: 2px solid var(--gold);
+  padding-bottom: 0.1em;
+}
+
+.site-nav a:hover { color: var(--julia-purple-text); }
+
+/* ==================================================================
+    HOME PAGE (POSTER LAYOUT)
+================================================================== */
+
+body.home .franklin-content {
+  padding: 0 var(--gutter);
+  line-height: 1.35;
+}
+
+.poster-contacts {
+  margin-top: calc(0.8 * var(--u));
+  font-size: max(1rem, calc(1.55 * var(--u)));
+}
+
+.poster-contacts p { margin: 0.25em 0; }
+
+.poster-meeting {
+  margin-top: calc(7 * var(--u));
+  font-size: max(1.3rem, calc(3.8 * var(--u)));
+  font-weight: 400;
+  line-height: 1.3;
+}
+
+.poster-meeting p { margin: 0; }
+
+.poster-contacts strong,
+.poster-meeting strong { font-weight: 600; }
+
+/* ==================================================================
+    MEETINGS (generated in utils.jl)
+================================================================== */
+
+.next-meeting {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.3em;
+  margin-top: calc(3 * var(--u));
+  padding: 1em 1.4em;
+  background: color-mix(in srgb, white 35%, var(--bg));
+  font-size: max(1rem, calc(1.4 * var(--u)));
+}
+
+.next-meeting-label {
+  font-size: 0.75em;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.franklin-content .next-meeting > a:first-of-type { font-weight: 600; }
+.next-meeting-when { color: var(--muted); }
+.next-meeting-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3em 1.2em;
+  font-size: 0.85em;
+}
+
+.calendar-feed {
+  padding: 0.6em 1em;
+  background: color-mix(in srgb, white 35%, var(--bg));
+}
+
+.meeting-list {
+  list-style: none;
+  padding: 0;
+}
+
+.meeting-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.2em 0.8em;
+  padding: 0.6em 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--ink) 15%, transparent);
+}
+
+.meeting-item time {
+  min-width: 15em;
+  color: var(--muted);
+}
+
+.meeting-speaker { color: var(--muted); }
+
+.meeting-info {
+  padding: 0.6em 1em;
+  background: color-mix(in srgb, white 35%, var(--bg));
+}
+
+.meeting-info p { margin: 0.3em 0; }
+
+.status {
+  display: inline-block;
+  margin-left: 0.5em;
+  padding: 0.05em 0.5em;
+  border-radius: 1em;
+  font-size: 0.75em;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  vertical-align: 0.1em;
+}
+
+.status-postponed { background: var(--circle-purple); }
+.status-cancelled { background: var(--circle-red); }
+
+/* ==================================================================
+    INNER PAGES
+================================================================== */
+
+body.inner .franklin-content {
+  max-width: 46rem;
+  padding: calc(2 * var(--u) + 1.5rem) var(--gutter) 0;
+  line-height: 1.45;
+}
+
+/* ==================================================================
+    FOOT / COPYRIGHT
+================================================================== */
+
+.page-foot {
+  font-size: 80%;
+  color: var(--muted);
+  margin-top: 6em;
+  border-top: 1px solid color-mix(in srgb, var(--ink) 20%, transparent);
+  padding-top: 1.5em;
+  margin-bottom: 3em;
+}
+
+.franklin-content .page-foot a { color: inherit; }
+
+/* ==================================================================
+    TITLES
+================================================================== */
+
+.franklin-content h1,
+.franklin-content h2,
+.franklin-content h3,
+.franklin-content h4,
+.franklin-content h5,
+.franklin-content h6 {
+  text-align: left;
+  line-height: 1.15;
+}
+
+.franklin-content h1 { font-size: 2.2rem; font-weight: 800; margin: 0.5em 0 0.6em; }
+.franklin-content h2 { font-size: 1.5rem; font-weight: 600; margin: 1.8em 0 0.6em; }
+.franklin-content h3 { font-size: 1.2rem; font-weight: 600; margin: 1.5em 0 0.5em; }
+
+.franklin-content h1 a,
+.franklin-content h2 a,
+.franklin-content h3 a,
+.franklin-content h4 a,
+.franklin-content h5 a,
+.franklin-content h6 a { color: inherit; text-decoration: none; }
+
+.franklin-toc li {
+  /* Avoid clickable elements being too close together. */
+  margin: 0.6rem 0;
+}
+
+.franklin-toc ol ol {
+  list-style-type: lower-alpha;
+}
+
+/* ==================================================================
+    GENERAL FORMATTING
+================================================================== */
+
+/* Spacing between bullet points. */
+.franklin-content li p {
+  margin: 10px 0;
+}
+
+/* Links are underlined, as on the poster. */
+.franklin-content a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.15em;
+}
+
+.franklin-content a:hover {
+  color: var(--julia-purple-text);
+}
+
+.franklin-content table {
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.franklin-content th,
+.franklin-content td {
+  font-size: var(--small);
+  padding: 8px 12px;
+  border-bottom: 1px solid color-mix(in srgb, var(--ink) 20%, transparent);
+}
+
+.franklin-content blockquote {
+  background: var(--block-background);
+  border-left: 5px solid var(--circle-purple);
+  margin: 1.5em 0;
+  padding: 0.5em 1em;
+  font-style: italic;
+}
+
+.franklin-content blockquote p {
+  display: inline;
+}
+
+/* ==================================================================
+    HYPERREFS AND FOOTNOTES
+================================================================== */
+
+.franklin-content .eqref a { color: var(--julia-green); }
+.franklin-content .bibref a { color: var(--julia-green); }
+
+.franklin-content .footnote {
+  position: relative;
+  top: -0.5em;
+  font-size: 70%;
+}
+
+.franklin-content sup {
+  font-size: 70%;
+  vertical-align: super;
+  line-height: 0;
+}
+
+.franklin-content table.fndef {
+  margin: 0;
+  margin-bottom: 10px;
+}
+
+.franklin-content .fndef tr,
+.franklin-content .fndef td {
+  padding: 0;
+  border: 0;
+  text-align: left;
+}
+
+.franklin-content .fndef tr {
+  border-left: 2px solid var(--muted);
+}
+
+.franklin-content .fndef td.fndef-backref {
+  vertical-align: top;
+  font-size: 70%;
+  padding-left: 5px;
+}
+
+.franklin-content .fndef td.fndef-content {
+  font-size: 80%;
+  padding-left: 10px;
+  width: 100%;
+}
+
+/* ==================================================================
+    IMAGES in CONTENT
+================================================================== */
+
+.franklin-content img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ==================================================================
+    KATEX
+================================================================== */
+
+body { counter-reset: eqnum; }
+
+.katex { font-size: 1em !important; }
+
+.katex-display .katex {
+  /* Overwrite KaTeX settings. */
+  display: inline-block;
+
+  /* Allow display equations to wrap on small screens. */
+  white-space: normal;
+}
+
+.katex-display::after {
+  counter-increment: eqnum;
+  content: "(" counter(eqnum) ")";
+  position: relative;
+  float: right;
+  padding-right: 5px;
+}
+
+.nonumber .katex-display::after {
+  counter-increment: nothing;
+  content: "";
+}
+
+/* ==================================================================
+    CODE & HIGHLIGHT.JS
+================================================================== */
+
+code {
+  background-color: var(--block-background);
+  padding: 0.1em 0.2em;
+  border-radius: 2px;
+  font-size: var(--small);
+}
+
+pre {
+  overflow-x: auto;
+}
+
+.hljs {
+  font-size: var(--small);
+  line-height: 1.35em;
+  border-radius: 10px;
+}
+
+.hljs-meta { font-weight: bold; }
+
+.hljs-meta.shell_ { color: var(--julia-red); }
+.hljs-meta.prompt_ { color: var(--julia-green); }
+
+.code-output {
+  background: var(--output-background);
+  border: 1px dashed color-mix(in srgb, var(--ink) 20%, transparent);
+}
