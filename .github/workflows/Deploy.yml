@@ -1,0 +1,59 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+  # Rebuild daily so upcoming and past meetings stay current.
+  schedule:
+    - cron: '0 9 * * *'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow one deployment at a time; let an in-progress one finish.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Julia
+        uses: julia-actions/setup-julia@v2
+        with:
+          version: '1.11' # Matches Manifest.toml.
+
+      - name: Cache Julia packages
+        uses: julia-actions/cache@v2
+
+      # Highlighting and math are rendered in the browser, so no NodeJS step is
+      # needed. optimize() reads `prepath` from config.md and fixes links.
+      - name: Build
+        run: julia --project=. -e '
+          using Pkg; Pkg.instantiate();
+          using Franklin;
+          optimize(minify=false, prerender=false)'
+
+      - name: Upload site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: __site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
